@@ -2,82 +2,83 @@ package project_spin;
 
 import java.time.LocalDate;
 import java.time.temporal.ChronoUnit;
-import java.util.Arrays;
-import java.util.Collections;
-
 import javax.tools.DocumentationTool.Location;
 
-import project_spin.*;
-import project_spin.CovidCases.CasePrediction;
+public final class Who {
 
-public class Who {
-
-	int countDead; // posoi nekroi sthn efarmogh
-	int countCured; // posoi therapeumenoi sthn efarmogh
-	int agd[]; // age group dead, se kathe hlikiaki omada
-	final String agegroups[] = { "0-19", "20-39", "40-59", "60-79", "80+" };
-
-	public void printPatientCount() {
-		// ektipwnei ola ta krousmata tis efarmogis
-		System.out.println("The number of covid patients registered in our application are:");
-		System.out.println(CovidCases.getPatientCounter());
+	protected void addSsn(int ssn) {
+		Ssn.addSsn(ssn);
 	}
 
-	public void sufficientSample() {
+	static int countDead; // posoi nekroi sthn efarmogh
+	static int countCured; // posoi therapeumenoi sthn efarmogh
+	static int agd[]; // age group dead, se kathe hlikiaki omada
+	static final String AGE_GROUPS[] = { "0-19", "20-39", "40-59", "60-79", "80+" };
+	static int ag[]; //age group, plhthysmos se kathe hlikiakh omada
+
+	public static void printPatientCount() {
+		// ektipwnei ola ta krousmata tis efarmogis
+		System.out.println("The number of covid patients registered in our application are:");
+		System.out.println(CovidCases.patientCounter);
+	}
+
+	public static void sufficientSample() {
 		// pou tha to kaloume??
 		// elegxei kai proeidopoiei an ta krousmata tis efarmogis mas einai liga
 		// etsi vste na einai aksiopista ta statistika
-		if (CovidCases.getPatientCounter() < 1000) {
+		if (CovidCases.patientCounter < 1000) {
 			System.out.println(
 					"Our statistic sample is less than 1000. The results produced may not lead to accurate conclusions.");
 		}
 	}
 
-	public void printDeaths() {
+	public static void printDeaths() {
 		// ektipwnei oloys toys nekrous apo covid apo tin efarmogi mas
 		System.out.println("The number of deaths due to covid in our application are:");
-		System.out.println(deathCount());
+		System.out.println(countDead);
 	}
 
-	public void printCured() {
-		// ektipwnei oloys osous exoun anarrwsei apo covid apo tin efarmogi mas
+	public static void printCured() {
+		// ektipwnei oloys osous exoun anarrwsei apo covid apo tin efarmogi
 		System.out.println("The number of cured covid patients in our application are:");
-		System.out.println(curedCount());
+		System.out.println(countCured);
 	}
 
-	public int deathCount() {
+	protected static void deathCount() {
 		// metraei tous nekrous apo covid
-		if (CovidCases.getStatus() == 1) {
-			countDead = +1;
-			return countDead;
+		for (CovidCases i : CovidCases.cases) {
+			if (i.getStatus() == 1) {
+				countDead = +1;
+			}
 		}
 	}
 
-	public int curedCount() {
+	protected static void curedCount() {
 		// metraei osous exoun therapeutei apo covid
-		if (CocvidCases.getStatus() == 0) {
-			countCured = +1;
-			return countCured;
+		for (CovidCases i : CovidCases.cases) {
+			if (i.getStatus() == 0) {
+				countCured = +1;
+			}
 		}
 	}
 
-	public double symptomsPercentage() {
+	protected static double[] symptomsPercentage() {
 		// vriskei to pososto emfanisis tou kathe symptom
-		double perc[];
-		for (int i = 0; i <= User.symptomsList.length(); i++) {
-			perc[i] = CovidCases.symptoms_counter(i) / CovidCases.getPatientCounter() * 100;
+		double perc[] = new double[13];
+		for (int i = 0; i <= User.symptomsList.length; i++) {
+			perc[i] = CovidCases.symptoms_counter[i] / CovidCases.patientCounter * 100;
 		}
 		return perc;
 	}
 
-	protected int[][] symptomsFrequency() {
-		
-		double perc = symptomsPercentage();
-		int[] max = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
-		for (int i = 0; i < counter.length; i++) {
+	protected static double[][] symptomsFrequency() {
+
+		double[] perc = symptomsPercentage();
+		double[] max = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12};
+		for (int i = 0; i < CovidCases.symptoms_counter.length; i++) {
 			for (int j = i+1; j < perc.length; j++) {
 				if (perc[j] > perc[i]) {
-			            int temp;
+			        double temp;
 				    temp = perc[i];
 				    perc[i] = perc[j];
 				    perc[j] = temp;
@@ -87,81 +88,83 @@ public class Who {
 				}
 			}
 		}
-		int[][] sym = new int {{perc},{max}}
+		double[][] sym = {perc, max};
 		return sym; //ftiaxnoume disdiastato pinaka sym me to pososto forwn pou exei 
 		//parousiastei ena symptom kai dipla ton deikti tou symptomatos
 	}
 
-	public void frequentSymptoms() {
-	 //typwnei thn seira syxnothtas twn symptomatwn 
-		for (i=0; i<=sym.length(); i++) {
-			System.out.println(sym[i][0] + "% of our registered patients have experienced" User.symptomsList[sym[i][1]]);
+	public static void frequentSymptoms() {
+	 //typwnei thn seira syxnothtas twn symptomatwn
+		double sym[][] = symptomsFrequency();
+		for (int i = 0; i < sym.length; i++) {
+			System.out.println(sym[i][0] + "% of our registered patients have experienced" + 
+			User.symptomsList[(int) sym[i][1]]);
 		 }
 	}
 
-	public void ageMortality() {
+	protected static void ageMortality() {
 		// otan kaneis update sto status
 		// kalei tin ageGroups gia tous nekrous tis efarmogis
-		if (CovidCases.getStatus() == 1) {
-			ageGroups(agd);
+		for (CovidCases i : CovidCases.cases) {
+			if (i.getStatus() == 1) {
+				agd = ageGroups(i, agd);
+			}
 		}
 	}
 
-	public int[] ageGroups(int[] a) {
-		// mallon tha prepei na kaleitai apo tin covidcases + na ftiatxei enas pinakas
-		// me to count twn atomwn kathe ilikiakis omadas
-		// dimiourgei pinakes plithismou se kathe ilikiaki omada
-		if (CovidCases.age >= 0 && CovidCases.age <= 19) {
-			a[0] = +1;
-		} else if (CovidCases.age >= 20 && CovidCases.age <= 39) {
-			a[1] = +1;
-		} else if (CovidCases.age >= 40 && CovidCases.age <= 59) {
-			a[2] = +1;
-		} else if (CovidCases.age >= 60 && CovidCases.age <= 79) {
-			a[3] = +1;
-		} else if (CovidCases.age >= 80) {
-			a[4] = +1;
+	protected static void ccInAgeGroup() {
+
+		for (CovidCases i : CovidCases.cases) {
+			ag = ageGroups(i, ag);
+		}
+
+	}
+
+	protected static int[] ageGroups(CovidCases cc, int a[]) {
+		if (cc.patientAge >= 0 && cc.patientAge <= 19) {
+			a[0] =+ 1;
+		} else if (cc.patientAge >= 20 && cc.patientAge <= 39) {
+			a[1] =+ 1;
+		} else if (cc.patientAge >= 40 && cc.patientAge <= 59) {
+			a[2] =+ 1;
+		} else if (cc.patientAge >= 60 && cc.patientAge <= 79) {
+			a[3] =+ 1;
+		} else if (cc.patientAge >= 80) {
+			a[4] =+ 1;
 		}
 		return a;
 	}
 
-	public double deathPercentagePerAge (int num) {
+	protected static double[] deathPercentagePerAge () {
 		//vriskei to pososto twn nekrwn apo covid tis efarmogis mas ana ilikiako group
-		return double dperc_ag = countDead / CovidCases.ageGroups() * 100; //xreiazomaste edw ton pinaka pou tha ftiaxtei apo tin covidcases
+		ageMortality();
+		ccInAgeGroup();
+		double[] dperc_ag = new double[4];
+		for (int i = 0; i < 4; i++) {
+			dperc_ag[i] = agd[i] / ag[i] * 100;
 		}
+		return dperc_ag;
+	}
 
-	public void deathsPerAge() {
+	public static void deathsPerAge() {
 		// kalei tin deathPercentage gia kathe ilikiako group kai ektypwnei tin
 		// thnisimotita tou
+		double[] dper_ag = deathPercentagePerAge();
 		for (int i = 0; i <= 4; i++) {
-			System.out.println(deathPercentage(agd[i]) + "% of this age group:" + agegroups[i] + "have passed away.");
-		}
-	}
-
-	public void printAgeAverage() {
-		// typwnei ton meso oro ilikias twn asthenwn
-		System.out.println(CovidCases.ageAverage() + "is the average age of our registered covid patients.");
-	}
-
-	public void printAgeAveragePerSymptom() {
-		// typwnei ton meso oro ilikas twn asthenwn ana symptwma
-		for (i = 0; i <= User.symptomsList.length(); i++) {
-			System.out.println(ageAveragePerSymptom.counter[i]
-					+ "is the average age of our registered covid patients who have experienced"
-					+ User.symptomsList[i]);
+			System.out.println(dper_ag[i] + "% of this age group:" + AGE_GROUPS[i] + " have passed away.");
 		}
 	}
 
 	/*
-	 * STATISTIKA STOIXEIA arithmos kroysmatwn arithmos kroysmatwn ana perioxh pio
-	 * syxna symptwmata pososto thanatwn pososto therapeymenwn
+	 * STATISTIKA STOIXEIA arithmos kroysmatwn, arithmos kroysmatwn ana perioxh, pio
+	 * syxna symptwmata, pososto thanatwn, pososto therapeymenwn
 	 */
-	protected int getPatientCounter() {
+	protected static int getPatientCounter() {
 		return CovidCases.patientCounter;
 	}
 
 	// deixnei gia thn topothesia pou bazeis ta kroysmata poy exei
-	protected int casesPerLocation(Location l) {
+	protected static int casesPerLocation(Location l) {
 		int counter = 0;
 		for (CovidCases cc : CovidCases.cases) {
 			if (cc.getPatientLocation().equals(l)) {
@@ -173,7 +176,7 @@ public class Who {
 
 	// epistrefei enan pinaka opoy h kathe thesh antistoixei
 	// se mia perioxh kai dexnei th syxnothta twn kroysmatwn gia oles tis perioxes
-	protected int[] casesForAllLocations() {
+	protected static int[] casesForAllLocations() {
 		int i = 0;
 		int counter[] = new int[CovidCases.location_counter.length];
 		for (Location l : Location.values()) {
@@ -188,13 +191,13 @@ public class Who {
 	}
 
 	public static void printCasesForAllLocations() {
-		int counter[] = casesForAllLocations;
-		for (i = 1; i <= 13; i++) {
+		int counter[] = casesForAllLocations();
+		for (int i = 1; i <= 13; i++) {
 			System.out.println(Location.values()[i] + " has " + counter[i] + " cases.");
 		}
 	}
 
-	protected void percentageOfDeaths() {
+	public static void percentageOfDeaths() {
 		double x = 0;
 		try {
 			x = ((double) CovidCases.getDeaths() / (double) CovidCases.patientCounter) * 100;
@@ -204,7 +207,7 @@ public class Who {
 		}
 	}
 
-	protected void percentageOfCured() {
+	public static void percentageOfCured() {
 		double x = 0;
 		try {
 			x = ((double) CovidCases.getCured() / (double) CovidCases.patientCounter) * 100;
@@ -214,7 +217,7 @@ public class Who {
 		}
 	}
 
-	protected void ageAverage() {
+	public static void ageAverage() {
 		int x = 0;
 		for (int i : CovidCases.age) {
 			x += i;
@@ -227,7 +230,7 @@ public class Who {
 		}
 	}
 
-	protected void ageAveragePerSymptom() {
+	public static void ageAveragePerSymptom() {
 		int[] counter = new int[13];
 		for (CovidCases i : CovidCases.cases) {
 			for (int j = 0; j < 13; j++) {
@@ -294,7 +297,7 @@ public class Who {
 
 	// o eody kalei ayth th methodo kai bazei thn hmeromhnia poy thelei na
 	// problepsei posa kroysmata ua yparxoyn
-	protected long getMonthlyPredection(int day, int month, int year) {
+	public long getMonthlyPrediction(int day, int month, int year) {
 		CasePrediction prediction = new CasePrediction(LocalDate.of(day, month, year));
 		prediction.updateN();
 		prediction.updateSumX();

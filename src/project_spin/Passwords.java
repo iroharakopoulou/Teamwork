@@ -1,54 +1,51 @@
 package project_spin;
 
-import java.io.DataInputStream;
-import java.io.InputStream;
-import java.io.DataOutputStream;
-import java.io.OutputStream;
-import java.io.InputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.FileNotFoundException;
-import java.io.FileOutputStream;
-import java.io.IOException;
-class Passwords {
-	private static File file = new File("\"https://github.com/Ioanna2001/Teamwork/tree/main/src/project_spin/passwords//");
+import java.util.HashMap;
+//class for storing and checking passwords
+public class Passwords {
+	private static HashMap<String, Boolean> passwords = new HashMap<String, Boolean>();
+	//matches passwords with email
+	private static HashMap<String, String> emailPasswords = new HashMap<String, String>();
 
-	protected static void writePassword(String password) {
-		DataOutputStream output;
-		try {
-			output = new DataOutputStream(new FileOutputStream(file));
-			output.writeChars(password);
-			output.close();
-		} catch (IOException e1) {
-			System.err.println("Error in data output method: writeSsn");
-		}
+	public static void addPassword(String pw, String email){
+		passwords.put(pw, false);
+		emailPasswords.put(pw, email);
 	}
 
-	protected static String readPassword(){
-		try {
-			DataInputStream input = new DataInputStream(new FileInputStream(file));
-			@SuppressWarnings("deprecation")
-			String x = input.readLine();
-			input.close();
-			return x;
-		} catch (Exception e) {
-			System.err.println("Error in data input method: readSsn");
-		}
-		finally {
-			//an to arxeio den exei allo password epistrefei null
-			return null;
+	protected static boolean checkPasswordExistence(String pw, String email) {
+		if (passwords.containsKey(pw) ) {
+			return false;
+		} else {
+			emailPasswords.put(pw, email);
+			return true;
 		}
 	}
-
-	protected static boolean checkPassword(String pw) {
-		boolean flag = false;
-		String input;
-		do {
-			input = readPassword();
-			if (input.equals(pw)){
-				flag = true;
+	public static boolean checkPasswordVerification(String pw, String email){
+		if (passwords.containsKey(pw)) {
+			if (passwords.get(pw) == false) {
+				if (emailPasswords.get(pw).equals(email)) {
+					passwords.put(pw, true);
+					return true;
+				}
 			}
-		} while (!(input.equals(null)));
-		return flag;
+		}
+		return false;
+	}
+	
+	public static boolean emailMatchesPassword(String pw, String email) {
+		if (emailPasswords.containsKey(pw)) {
+			if (emailPasswords.get(pw).equals(email)) {
+				return true;
+			}
+		}
+		return false;
+	}
+
+	protected static boolean hasKey(String pw) {
+		return passwords.containsKey(pw);
+	}
+
+	protected static boolean getValue(String pw) {
+		return passwords.get(pw);
 	}
 }
